@@ -53,6 +53,10 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //#1 https://segunfamisa.com/posts/android-gradle-extra-properties
+    //$rootProject.supportLibraryVersion we use this to avoid repeating same version multiple time so we declare a variable
+    //1.in build.gradle(Project:) we define ext{}  where we define the variable
+
     implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
     implementation "com.android.support:design:$rootProject.supportLibraryVersion"
     implementation "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"

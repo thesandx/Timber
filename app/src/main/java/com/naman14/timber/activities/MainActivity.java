@@ -74,6 +74,9 @@ import java.util.Map;
 
 public class MainActivity extends BaseActivity implements ATEActivityThemeCustomizer {
 
+    //#4 library https://github.com/garretyoder/app-theme-engine
+    //implements ATEActivityThemeCustomizer this is from above library which is used to implement the different themes.
+
     private SlidingUpPanelLayout panelLayout;
     private NavigationView navigationView;
     private TextView songtitle, songartist;

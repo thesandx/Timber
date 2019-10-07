@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
-
+    <!-- #2.android:label="Timber${appNameSuffix}" go to build gradle(app) buildTypes line no 20 for test and release diff names of app like Timber and Timber-Dev   -->
     <application
         android:name=".TimberApp"
         android:allowBackup="false"
@@ -22,10 +22,21 @@
         android:theme="@style/AppTheme.FullScreen.Light"
         tools:replace="android:allowBackup, android:label">
 
+
         <activity
             android:name=".activities.MainActivity"
             android:label="Timber${appNameSuffix}"
             android:screenOrientation="portrait">
+            <!-- https://developer.android.com/guide/components/intents-filters -->
+            <!--#3.inside every intent-filter there will be <action which define for which purpose this
+            activity can be started.
+            for ex-you have a mp3 file downloaded in your folder when you click on this file android will show your app
+            if you have define action as View and the category as app music.
+            for more can refer above link.
+            />
+
+            so here basically mainActivity is the mainActivity which will launch when app will be started every time.
+              -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
