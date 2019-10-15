@@ -88,11 +88,20 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
     private DrawerLayout mDrawerLayout;
     private boolean isDarkTheme;
 
+    //by default it is runnable since it is first item in the menu.
+    //so on home screen first thing you will see is this fragment.
     private Runnable navigateLibrary = new Runnable() {
         public void run() {
+            //do not forgot to do this otherwise multiple item will be checked even your group of menu is singleChecked.
             navigationView.getMenu().findItem(R.id.nav_library).setChecked(true);
+
             Fragment fragment = new MainFragment();
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            //here commitAllowingStateLoss() is used instead of commit() i.e donot wait what is happening on
+            //main Activity ui just load it.
+            //in commit fragment will load only when work on ui therad is completed.
+            //since this is main thread that is why commitAllowingStateLoss()
+            //otherwise in below runnable you will se only commit();
             transaction.replace(R.id.fragment_container, fragment).commitAllowingStateLoss();
 
         }
@@ -182,7 +191,7 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
+        //checking for which action this activity is invoked
         action = getIntent().getAction();
 
         isDarkTheme = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("dark_theme", false);
@@ -190,29 +199,42 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //putting all Runnable in Hashmap
         navigationMap.put(Constants.NAVIGATE_LIBRARY, navigateLibrary);
         navigationMap.put(Constants.NAVIGATE_PLAYLIST, navigatePlaylist);
         navigationMap.put(Constants.NAVIGATE_QUEUE, navigateQueue);
         navigationMap.put(Constants.NAVIGATE_NOWPLAYING, navigateNowplaying);
+
+//this is for the navigation header Runnables
         navigationMap.put(Constants.NAVIGATE_ALBUM, navigateAlbum);
         navigationMap.put(Constants.NAVIGATE_ARTIST, navigateArtist);
         navigationMap.put(Constants.NAVIGATE_LYRICS, navigateLyrics);
 
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+
         panelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View header = navigationView.inflateHeaderView(R.layout.nav_header);
 
+//setting the navigation header layout
+        View header = navigationView.inflateHeaderView(R.layout.nav_header);
         albumart = (ImageView) header.findViewById(R.id.album_art);
         songtitle = (TextView) header.findViewById(R.id.song_title);
         songartist = (TextView) header.findViewById(R.id.song_artist);
 
+
         setPanelSlideListeners(panelLayout);
+
+        //source for handler
+        //https://en.proft.me/2017/04/15/understanding-handler-android/
+
+        //here handler will execute the code inside run after .7 seconds.
 
         navDrawerRunnable.postDelayed(new Runnable() {
             @Override
             public void run() {
+                //this method contains onNavigationItem ClickListener,which evoked every time we clicked on navigation item.
                 setupDrawerContent(navigationView);
                 setupNavigationIcons(navigationView);
             }
@@ -227,6 +249,8 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
         }
 
         addBackstackListener();
+
+        //i.e if action is view then run this code
 
         if(Intent.ACTION_VIEW.equals(action)) {
             Handler handler = new Handler();
@@ -277,6 +301,7 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
         new initQuickControls().execute("");
     }
 
+    //check for permission if yse then ok if not then ask for it.Nammu is the library here.
     private void checkPermissionAndThenLoad() {
         //check for permission
         if (Nammu.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE) && Nammu.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -334,6 +359,7 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(final MenuItem menuItem) {
+                        //it gives you menuitem.now inside this method decide on which menu what you want to do.
                         updatePosition(menuItem);
                         return true;
 
@@ -423,6 +449,10 @@ public class MainActivity extends BaseActivity implements ATEActivityThemeCustom
                 break;
         }
 
+
+        //now the menuitem is checked and if it is runnable wala then
+        //execute the run() method of that runnable.
+        //which basically contain the fragments.so it will evoke the fragments.
         if (runnable != null) {
             menuItem.setChecked(true);
             mDrawerLayout.closeDrawers();
